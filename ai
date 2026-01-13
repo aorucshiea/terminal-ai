@@ -1,0 +1,23 @@
+#!/usr/bin/env python3
+"""
+终端 AI 助手 - 可执行命令
+使用方式:
+  ai "解释一下发生了什么"
+  /ai "解释一下发生了什么"
+"""
+
+import sys
+import os
+
+# 获取脚本所在目录
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# 将项目目录添加到 Python 路径
+if script_dir not in sys.path:
+    sys.path.insert(0, script_dir)
+
+# 导入并运行主程序
+from ai_cli import main
+
+if __name__ == "__main__":
+    main()

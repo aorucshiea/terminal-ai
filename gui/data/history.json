@@ -1,0 +1,22 @@
+{
+  "history": [
+    {
+      "timestamp": "2026-01-12T20:00:00",
+      "config_name": "default",
+      "message": "你好，请介绍一下你自己",
+      "response": "我是 Terminal AI 助手，可以帮助你解决编程和命令行问题。"
+    },
+    {
+      "timestamp": "2026-01-12T20:05:00",
+      "config_name": "default",
+      "message": "1+1等于几？",
+      "response": "1+1=2"
+    },
+    {
+      "timestamp": "2026-01-12T20:10:00",
+      "config_name": "test",
+      "message": "如何使用 grep 查找文件？",
+      "response": "使用 grep -r '关键词' 目录名 可以递归查找文件中的内容。"
+    }
+  ]
+}
