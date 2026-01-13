@@ -1,0 +1,2 @@
+# terminal-ai
+terminal-ai
