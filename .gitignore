@@ -36,6 +36,11 @@ env/
 .session_history.json
 .trusted_commands.json
 
+# GUI data files
+gui/data/configs.json
+gui/data/history.json
+gui/data/stats.json
+
 # Backup files
 *.backup
 
