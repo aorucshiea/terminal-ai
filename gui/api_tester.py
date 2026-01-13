@@ -1,5 +1,5 @@
 """
-API 测试界面
+API 测试界面 - 基于 Soft UI Evolution 风格
 """
 
 import json
@@ -18,6 +18,25 @@ except ImportError:
     print("错误: 需要安装 PyQt5")
     print("运行: pip install PyQt5")
     raise
+
+# SaaS 配色方案
+COLORS = {
+    'primary': '#2563EB',
+    'primary_hover': '#1D4ED8',
+    'primary_light': '#DBEAFE',
+    'secondary': '#3B82F6',
+    'background': '#F8FAFC',
+    'surface': '#FFFFFF',
+    'text': '#1E293B',
+    'text_muted': '#64748B',
+    'border': '#E2E8F0',
+    'border_hover': '#CBD5E1',
+    'danger': '#EF4444',
+    'danger_hover': '#DC2626',
+    'danger_light': '#FEE2E2',
+    'success': '#10B981',
+    'warning': '#F59E0B',
+}
 
 
 class APIStreamThread(QThread):
@@ -81,12 +100,63 @@ class APITester(QWidget):
 
     def setup_ui(self):
         layout = QVBoxLayout()
+        layout.setContentsMargins(24, 24, 24, 24)
+        layout.setSpacing(20)
 
         # 配置选择
         config_group = QGroupBox("选择配置")
+        config_group.setStyleSheet(f"""
+            QGroupBox {{
+                font-weight: 600;
+                border: 1px solid {COLORS['border']};
+                border-radius: 12px;
+                margin-top: 12px;
+                padding-top: 16px;
+                background-color: {COLORS['surface']};
+                color: {COLORS['text']};
+            }}
+            QGroupBox::title {{
+                subcontrol-origin: margin;
+                left: 16px;
+                padding: 0 8px;
+                color: {COLORS['text']};
+                font-size: 14px;
+            }}
+        """)
         config_layout = QHBoxLayout()
-        config_layout.addWidget(QLabel("配置:"))
+        config_layout.setContentsMargins(16, 8, 16, 16)
+
+        config_label = QLabel("配置:")
+        config_label.setStyleSheet(f"color: {COLORS['text']}; font-size: 14px; font-weight: 500;")
+        config_layout.addWidget(config_label)
+
         self.config_combo = QComboBox()
+        self.config_combo.setStyleSheet(f"""
+            QComboBox {{
+                background-color: {COLORS['surface']};
+                border: 1px solid {COLORS['border']};
+                border-radius: 8px;
+                padding: 8px 12px;
+                font-size: 14px;
+                color: {COLORS['text']};
+            }}
+            QComboBox:focus {{
+                border: 2px solid {COLORS['primary']};
+            }}
+            QComboBox:hover {{
+                border-color: {COLORS['border_hover']};
+            }}
+            QComboBox::drop-down {{
+                border: none;
+                width: 20px;
+            }}
+            QComboBox::down-arrow {{
+                image: none;
+                border-left: 5px solid transparent;
+                border-right: 5px solid transparent;
+                border-top: 5px solid {COLORS['text_muted']};
+            }}
+        """)
         self.config_combo.currentIndexChanged.connect(self.on_config_changed)
         config_layout.addWidget(self.config_combo)
         config_layout.addStretch()
@@ -94,18 +164,92 @@ class APITester(QWidget):
 
         # 输入区域
         input_group = QGroupBox("输入消息")
+        input_group.setStyleSheet(f"""
+            QGroupBox {{
+                font-weight: 600;
+                border: 1px solid {COLORS['border']};
+                border-radius: 12px;
+                margin-top: 12px;
+                padding-top: 16px;
+                background-color: {COLORS['surface']};
+                color: {COLORS['text']};
+            }}
+            QGroupBox::title {{
+                subcontrol-origin: margin;
+                left: 16px;
+                padding: 0 8px;
+                color: {COLORS['text']};
+                font-size: 14px;
+            }}
+        """)
         input_layout = QVBoxLayout()
+        input_layout.setContentsMargins(16, 8, 16, 16)
+        input_layout.setSpacing(12)
+
         self.message_input = QTextEdit()
         self.message_input.setPlaceholderText("输入要发送给 AI 的消息...")
-        self.message_input.setMaximumHeight(100)
+        self.message_input.setMaximumHeight(120)
+        self.message_input.setStyleSheet(f"""
+            QTextEdit {{
+                background-color: {COLORS['surface']};
+                border: 1px solid {COLORS['border']};
+                border-radius: 8px;
+                padding: 12px 14px;
+                font-size: 14px;
+                color: {COLORS['text']};
+            }}
+            QTextEdit:focus {{
+                border: 2px solid {COLORS['primary']};
+            }}
+            QTextEdit:hover {{
+                border-color: {COLORS['border_hover']};
+            }}
+        """)
         input_layout.addWidget(self.message_input)
 
         # 按钮
         btn_layout = QHBoxLayout()
+        btn_layout.setSpacing(12)
+
         self.send_btn = QPushButton("发送")
+        self.send_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {COLORS['primary']};
+                color: {COLORS['surface']};
+                border: none;
+                border-radius: 8px;
+                padding: 10px 24px;
+                font-size: 14px;
+                font-weight: 500;
+            }}
+            QPushButton:hover {{
+                background-color: {COLORS['primary_hover']};
+            }}
+            QPushButton:disabled {{
+                background-color: {COLORS['border']};
+                color: {COLORS['text_muted']};
+            }}
+        """)
         self.send_btn.clicked.connect(self.send_message)
+
         self.clear_btn = QPushButton("清空")
+        self.clear_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {COLORS['background']};
+                color: {COLORS['text']};
+                border: 1px solid {COLORS['border']};
+                border-radius: 8px;
+                padding: 10px 24px;
+                font-size: 14px;
+                font-weight: 500;
+            }}
+            QPushButton:hover {{
+                background-color: {COLORS['border']};
+            }}
+        """)
         self.clear_btn.clicked.connect(self.clear_all)
+
+        btn_layout.addStretch()
         btn_layout.addWidget(self.send_btn)
         btn_layout.addWidget(self.clear_btn)
         input_layout.addLayout(btn_layout)
@@ -114,15 +258,46 @@ class APITester(QWidget):
 
         # 输出区域
         output_group = QGroupBox("AI 响应")
+        output_group.setStyleSheet(f"""
+            QGroupBox {{
+                font-weight: 600;
+                border: 1px solid {COLORS['border']};
+                border-radius: 12px;
+                margin-top: 12px;
+                padding-top: 16px;
+                background-color: {COLORS['surface']};
+                color: {COLORS['text']};
+            }}
+            QGroupBox::title {{
+                subcontrol-origin: margin;
+                left: 16px;
+                padding: 0 8px;
+                color: {COLORS['text']};
+                font-size: 14px;
+            }}
+        """)
         output_layout = QVBoxLayout()
+        output_layout.setContentsMargins(16, 8, 16, 16)
+
         self.response_output = QTextEdit()
         self.response_output.setReadOnly(True)
         self.response_output.setPlaceholderText("AI 响应将显示在这里...")
+        self.response_output.setStyleSheet(f"""
+            QTextEdit {{
+                background-color: {COLORS['background']};
+                border: 1px solid {COLORS['border']};
+                border-radius: 8px;
+                padding: 12px 14px;
+                font-size: 14px;
+                color: {COLORS['text']};
+            }}
+        """)
         output_layout.addWidget(self.response_output)
         output_group.setLayout(output_layout)
 
         # 状态栏
         self.status_label = QLabel("就绪")
+        self.status_label.setStyleSheet(f"color: {COLORS['text_muted']}; font-size: 13px;")
 
         layout.addWidget(config_group)
         layout.addWidget(input_group)

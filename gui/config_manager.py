@@ -1,5 +1,5 @@
 """
-配置管理界面
+配置管理界面 - 基于 Soft UI Evolution 风格
 """
 
 import json
@@ -18,6 +18,25 @@ except ImportError:
     print("运行: pip install PyQt5")
     raise
 
+# SaaS 配色方案
+COLORS = {
+    'primary': '#2563EB',
+    'primary_hover': '#1D4ED8',
+    'primary_light': '#DBEAFE',
+    'secondary': '#3B82F6',
+    'background': '#F8FAFC',
+    'surface': '#FFFFFF',
+    'text': '#1E293B',
+    'text_muted': '#64748B',
+    'border': '#E2E8F0',
+    'border_hover': '#CBD5E1',
+    'danger': '#EF4444',
+    'danger_hover': '#DC2626',
+    'danger_light': '#FEE2E2',
+    'success': '#10B981',
+    'warning': '#F59E0B',
+}
+
 
 class ConfigDialog(QDialog):
     """配置编辑对话框"""
@@ -26,46 +45,195 @@ class ConfigDialog(QDialog):
         super().__init__(parent)
         self.config = config or {}
         self.setWindowTitle("编辑配置" if config else "添加配置")
-        self.setMinimumWidth(400)
+        self.setMinimumWidth(450)
         self.setup_ui()
 
     def setup_ui(self):
-        layout = QFormLayout()
+        layout = QVBoxLayout()
+        layout.setContentsMargins(24, 24, 24, 24)
+        layout.setSpacing(20)
+
+        # 标题
+        title = QLabel("配置详情")
+        title.setStyleSheet(f"""
+            QLabel {{
+                color: {COLORS['text']};
+                font-size: 18px;
+                font-weight: 600;
+            }}
+        """)
+        layout.addWidget(title)
+
+        # 表单
+        form_layout = QFormLayout()
+        form_layout.setSpacing(16)
 
         self.name_edit = QLineEdit(self.config.get("name", ""))
+        self.name_edit.setPlaceholderText("配置名称")
+        self.name_edit.setStyleSheet(f"""
+            QLineEdit {{
+                background-color: {COLORS['surface']};
+                border: 1px solid {COLORS['border']};
+                border-radius: 8px;
+                padding: 10px 14px;
+                font-size: 14px;
+                color: {COLORS['text']};
+            }}
+            QLineEdit:focus {{
+                border: 2px solid {COLORS['primary']};
+            }}
+            QLineEdit:hover {{
+                border-color: {COLORS['border_hover']};
+            }}
+        """)
+
         self.api_key_edit = QLineEdit(self.config.get("api_key", ""))
         self.api_key_edit.setEchoMode(QLineEdit.Password)
+        self.api_key_edit.setPlaceholderText("API Key")
+        self.api_key_edit.setStyleSheet(f"""
+            QLineEdit {{
+                background-color: {COLORS['surface']};
+                border: 1px solid {COLORS['border']};
+                border-radius: 8px;
+                padding: 10px 14px;
+                font-size: 14px;
+                color: {COLORS['text']};
+            }}
+            QLineEdit:focus {{
+                border: 2px solid {COLORS['primary']};
+            }}
+            QLineEdit:hover {{
+                border-color: {COLORS['border_hover']};
+            }}
+        """)
+
         self.endpoint_edit = QLineEdit(self.config.get("endpoint", ""))
+        self.endpoint_edit.setPlaceholderText("https://api.example.com/v1")
+        self.endpoint_edit.setStyleSheet(f"""
+            QLineEdit {{
+                background-color: {COLORS['surface']};
+                border: 1px solid {COLORS['border']};
+                border-radius: 8px;
+                padding: 10px 14px;
+                font-size: 14px;
+                color: {COLORS['text']};
+            }}
+            QLineEdit:focus {{
+                border: 2px solid {COLORS['primary']};
+            }}
+            QLineEdit:hover {{
+                border-color: {COLORS['border_hover']};
+            }}
+        """)
+
         self.model_edit = QLineEdit(self.config.get("model", "gpt-4"))
+        self.model_edit.setPlaceholderText("gpt-4")
+        self.model_edit.setStyleSheet(f"""
+            QLineEdit {{
+                background-color: {COLORS['surface']};
+                border: 1px solid {COLORS['border']};
+                border-radius: 8px;
+                padding: 10px 14px;
+                font-size: 14px;
+                color: {COLORS['text']};
+            }}
+            QLineEdit:focus {{
+                border: 2px solid {COLORS['primary']};
+            }}
+            QLineEdit:hover {{
+                border-color: {COLORS['border_hover']};
+            }}
+        """)
 
         self.max_tokens_spin = QSpinBox()
         self.max_tokens_spin.setRange(1, 100000)
         self.max_tokens_spin.setValue(self.config.get("max_tokens", 2000))
+        self.max_tokens_spin.setStyleSheet(f"""
+            QSpinBox {{
+                background-color: {COLORS['surface']};
+                border: 1px solid {COLORS['border']};
+                border-radius: 8px;
+                padding: 10px 14px;
+                font-size: 14px;
+                color: {COLORS['text']};
+            }}
+            QSpinBox:focus {{
+                border: 2px solid {COLORS['primary']};
+            }}
+        """)
 
         self.temperature_spin = QDoubleSpinBox()
         self.temperature_spin.setRange(0, 2)
         self.temperature_spin.setSingleStep(0.1)
         self.temperature_spin.setValue(self.config.get("temperature", 0.7))
+        self.temperature_spin.setStyleSheet(f"""
+            QDoubleSpinBox {{
+                background-color: {COLORS['surface']};
+                border: 1px solid {COLORS['border']};
+                border-radius: 8px;
+                padding: 10px 14px;
+                font-size: 14px;
+                color: {COLORS['text']};
+            }}
+            QDoubleSpinBox:focus {{
+                border: 2px solid {COLORS['primary']};
+            }}
+        """)
 
-        layout.addRow("名称:", self.name_edit)
-        layout.addRow("API Key:", self.api_key_edit)
-        layout.addRow("Endpoint:", self.endpoint_edit)
-        layout.addRow("模型:", self.model_edit)
-        layout.addRow("最大 Tokens:", self.max_tokens_spin)
-        layout.addRow("温度:", self.temperature_spin)
+        form_layout.addRow("名称:", self.name_edit)
+        form_layout.addRow("API Key:", self.api_key_edit)
+        form_layout.addRow("Endpoint:", self.endpoint_edit)
+        form_layout.addRow("模型:", self.model_edit)
+        form_layout.addRow("最大 Tokens:", self.max_tokens_spin)
+        form_layout.addRow("温度:", self.temperature_spin)
 
+        layout.addLayout(form_layout)
+
+        # 按钮
         buttons = QHBoxLayout()
-        ok_btn = QPushButton("确定")
-        ok_btn.clicked.connect(self.accept)
-        cancel_btn = QPushButton("取消")
-        cancel_btn.clicked.connect(self.reject)
-        buttons.addWidget(ok_btn)
-        buttons.addWidget(cancel_btn)
+        buttons.setSpacing(12)
 
-        main_layout = QVBoxLayout()
-        main_layout.addLayout(layout)
-        main_layout.addLayout(buttons)
-        self.setLayout(main_layout)
+        cancel_btn = QPushButton("取消")
+        cancel_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {COLORS['background']};
+                color: {COLORS['text_muted']};
+                border: 1px solid {COLORS['border']};
+                border-radius: 8px;
+                padding: 10px 24px;
+                font-size: 14px;
+                font-weight: 500;
+            }}
+            QPushButton:hover {{
+                background-color: {COLORS['border']};
+                color: {COLORS['text']};
+            }}
+        """)
+        cancel_btn.clicked.connect(self.reject)
+
+        ok_btn = QPushButton("确定")
+        ok_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {COLORS['primary']};
+                color: {COLORS['surface']};
+                border: none;
+                border-radius: 8px;
+                padding: 10px 24px;
+                font-size: 14px;
+                font-weight: 500;
+            }}
+            QPushButton:hover {{
+                background-color: {COLORS['primary_hover']};
+            }}
+        """)
+        ok_btn.clicked.connect(self.accept)
+
+        buttons.addStretch()
+        buttons.addWidget(cancel_btn)
+        buttons.addWidget(ok_btn)
+
+        layout.addLayout(buttons)
+        self.setLayout(layout)
 
     def get_config(self) -> Optional[Dict]:
         """获取配置，验证后返回"""
@@ -115,26 +283,136 @@ class ConfigManager(QWidget):
 
     def setup_ui(self):
         layout = QHBoxLayout()
+        layout.setContentsMargins(24, 24, 24, 24)
+        layout.setSpacing(24)
 
         # 左侧配置列表
         left_panel = QVBoxLayout()
-        left_panel.addWidget(QLabel("配置列表:"))
+        left_panel.setSpacing(16)
+
+        # 标题
+        title = QLabel("配置列表")
+        title.setStyleSheet(f"""
+            QLabel {{
+                color: {COLORS['text']};
+                font-size: 16px;
+                font-weight: 600;
+            }}
+        """)
+        left_panel.addWidget(title)
 
         self.config_list = QListWidget()
         self.config_list.itemDoubleClicked.connect(self.edit_config)
+        self.config_list.setStyleSheet(f"""
+            QListWidget {{
+                background-color: {COLORS['surface']};
+                border: 1px solid {COLORS['border']};
+                border-radius: 12px;
+                font-size: 14px;
+                color: {COLORS['text']};
+            }}
+            QListWidget::item {{
+                padding: 12px 16px;
+                border-bottom: 1px solid {COLORS['border']};
+            }}
+            QListWidget::item:hover {{
+                background-color: {COLORS['background']};
+            }}
+            QListWidget::item:selected {{
+                background-color: {COLORS['primary_light']};
+                color: {COLORS['primary']};
+            }}
+        """)
         left_panel.addWidget(self.config_list)
 
         # 按钮组
         btn_layout = QHBoxLayout()
+        btn_layout.setSpacing(8)
+
         add_btn = QPushButton("添加")
+        add_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {COLORS['primary']};
+                color: {COLORS['surface']};
+                border: none;
+                border-radius: 8px;
+                padding: 10px 16px;
+                font-size: 14px;
+                font-weight: 500;
+            }}
+            QPushButton:hover {{
+                background-color: {COLORS['primary_hover']};
+            }}
+        """)
         add_btn.clicked.connect(self.add_config)
+
         edit_btn = QPushButton("编辑")
+        edit_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {COLORS['background']};
+                color: {COLORS['text']};
+                border: 1px solid {COLORS['border']};
+                border-radius: 8px;
+                padding: 10px 16px;
+                font-size: 14px;
+                font-weight: 500;
+            }}
+            QPushButton:hover {{
+                background-color: {COLORS['border']};
+            }}
+        """)
         edit_btn.clicked.connect(self.edit_config)
+
         delete_btn = QPushButton("删除")
+        delete_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {COLORS['danger_light']};
+                color: {COLORS['danger']};
+                border: none;
+                border-radius: 8px;
+                padding: 10px 16px;
+                font-size: 14px;
+                font-weight: 500;
+            }}
+            QPushButton:hover {{
+                background-color: {COLORS['danger']};
+                color: {COLORS['surface']};
+            }}
+        """)
         delete_btn.clicked.connect(self.delete_config)
+
         test_btn = QPushButton("测试连接")
+        test_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {COLORS['success']};
+                color: {COLORS['surface']};
+                border: none;
+                border-radius: 8px;
+                padding: 10px 16px;
+                font-size: 14px;
+                font-weight: 500;
+            }}
+            QPushButton:hover {{
+                background-color: #059669;
+            }}
+        """)
         test_btn.clicked.connect(self.test_connection)
+
         set_default_btn = QPushButton("设为默认")
+        set_default_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {COLORS['background']};
+                color: {COLORS['text']};
+                border: 1px solid {COLORS['border']};
+                border-radius: 8px;
+                padding: 10px 16px;
+                font-size: 14px;
+                font-weight: 500;
+            }}
+            QPushButton:hover {{
+                background-color: {COLORS['border']};
+            }}
+        """)
         set_default_btn.clicked.connect(self.set_default)
 
         btn_layout.addWidget(add_btn)
@@ -147,7 +425,26 @@ class ConfigManager(QWidget):
 
         # 右侧配置详情
         right_panel = QGroupBox("配置详情")
+        right_panel.setStyleSheet(f"""
+            QGroupBox {{
+                font-weight: 600;
+                border: 1px solid {COLORS['border']};
+                border-radius: 12px;
+                margin-top: 12px;
+                padding-top: 16px;
+                background-color: {COLORS['surface']};
+                color: {COLORS['text']};
+            }}
+            QGroupBox::title {{
+                subcontrol-origin: margin;
+                left: 16px;
+                padding: 0 8px;
+                color: {COLORS['text']};
+                font-size: 14px;
+            }}
+        """)
         right_layout = QFormLayout()
+        right_layout.setSpacing(16)
 
         self.detail_name = QLabel("-")
         self.detail_endpoint = QLabel("-")
@@ -155,6 +452,10 @@ class ConfigManager(QWidget):
         self.detail_max_tokens = QLabel("-")
         self.detail_temperature = QLabel("-")
         self.detail_default = QLabel("-")
+
+        for label in [self.detail_name, self.detail_endpoint, self.detail_model,
+                      self.detail_max_tokens, self.detail_temperature, self.detail_default]:
+            label.setStyleSheet(f"color: {COLORS['text']}; font-size: 14px;")
 
         right_layout.addRow("名称:", self.detail_name)
         right_layout.addRow("Endpoint:", self.detail_endpoint)
