@@ -1,6 +1,6 @@
 """
-Terminal AI GUI 主窗口 - 现代化设计
-基于 Soft UI Evolution + Swiss Modernism 2.0 风格
+Terminal AI GUI - 主窗口
+Glassmorphism + Dark Mode 设计
 """
 
 import sys
@@ -10,10 +10,10 @@ try:
     from PyQt5.QtWidgets import (
         QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
         QPushButton, QLabel, QStackedWidget, QStatusBar, QFrame,
-        QScrollArea, QGraphicsDropShadowEffect
+        QScrollArea, QGraphicsDropShadowEffect, QSizePolicy
     )
-    from PyQt5.QtCore import Qt, QPropertyAnimation, QEasingCurve, QRect, QPoint
-    from PyQt5.QtGui import QFont, QColor, QPainter, QLinearGradient, QBrush, QMouseEvent
+    from PyQt5.QtCore import Qt, QPropertyAnimation, QEasingCurve, QRect, QPoint, QSize
+    from PyQt5.QtGui import QFont, QColor, QPainter, QLinearGradient, QBrush, QMouseEvent, QCursor
 except ImportError:
     print("错误: 需要安装 PyQt5")
     print("运行: pip install PyQt5")
@@ -26,44 +26,131 @@ from gui.stats import StatsWidget
 from gui.command_manager import CommandManager
 
 
-# SaaS 配色方案
+# Glassmorphism Dark Mode 配色方案
 COLORS = {
-    'primary': '#2563EB',      # 主色 - 信任蓝
-    'primary_hover': '#1D4ED8',
-    'primary_light': '#DBEAFE',
-    'secondary': '#3B82F6',    # 次要色
-    'cta': '#F97316',          # CTA - 橙色
-    'cta_hover': '#EA580C',
-    'background': '#F8FAFC',   # 背景色
-    'surface': '#FFFFFF',      # 表面色
-    'text': '#1E293B',         # 主文本
-    'text_muted': '#64748B',   # 次要文本
-    'border': '#E2E8F0',       # 边框
-    'border_hover': '#CBD5E1',
-    'danger': '#EF4444',       # 危险
-    'danger_hover': '#DC2626',
-    'danger_light': '#FEE2E2',
-    'success': '#10B981',      # 成功
-    'warning': '#F59E0B',      # 警告
+    # 背景色
+    'bg_primary': '#0F172A',      # 深蓝灰背景
+    'bg_secondary': '#1E293B',    # 次级背景
+    'bg_card': 'rgba(30, 41, 59, 0.8)',  # 玻璃卡片背景
+    'bg_hover': 'rgba(51, 65, 85, 0.9)', # 悬停背景
+    'bg_input': '#1E293B',        # 输入框背景
+
+    # 文字色
+    'text_primary': '#F8FAFC',    # 主文字
+    'text_secondary': '#94A3B8',  # 次级文字
+    'text_muted': '#64748B',      # 弱化文字
+
+    # 主题色
+    'primary': '#F59E0B',         # 琥珀色 (主色)
+    'primary_hover': '#D97706',   # 琥珀色悬停
+    'primary_light': 'rgba(245, 158, 11, 0.15)',  # 琥珀色浅色
+
+    'accent': '#8B5CF6',          # 紫色 (强调色)
+    'accent_hover': '#7C3AED',    # 紫色悬停
+    'accent_light': 'rgba(139, 92, 246, 0.15)',   # 紫色浅色
+
+    # 状态色
+    'success': '#10B981',         # 绿色
+    'danger': '#EF4444',          # 红色
+    'warning': '#F59E0B',         # 橙色
+
+    # 边框
+    'border': 'rgba(51, 65, 85, 0.6)',  # 边框
+    'border_light': 'rgba(148, 163, 184, 0.3)',  # 浅边框
+    'border_focus': '#F59E0B',    # 焦点边框
 }
 
 
-class ModernCard(QFrame):
-    """现代化卡片 - Soft UI Evolution 风格"""
+class ResizableFrame(QFrame):
+    """可调整大小的框架"""
+
+    EDGE_SIZE = 8  # 边缘检测区域大小
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self._edge = None
+        self._dragging = False
+        self._drag_start_pos = None
+        self._drag_start_geometry = None
+
+    def mousePressEvent(self, event: QMouseEvent):
+        if event.button() == Qt.LeftButton:
+            self._dragging = True
+            self._drag_start_pos = event.globalPos()
+            self._drag_start_geometry = self.geometry()
+            event.accept()
+
+    def mouseMoveEvent(self, event: QMouseEvent):
+        if self._dragging and self._edge:
+            delta = event.globalPos() - self._drag_start_pos
+            geo = self._drag_start_geometry
+
+            if self._edge & Qt.LeftEdge:
+                geo.setLeft(geo.left() + delta.x())
+            if self._edge & Qt.RightEdge:
+                geo.setRight(geo.right() + delta.x())
+            if self._edge & Qt.TopEdge:
+                geo.setTop(geo.top() + delta.y())
+            if self._edge & Qt.BottomEdge:
+                geo.setBottom(geo.bottom() + delta.y())
+
+            self.setGeometry(geo)
+            event.accept()
+        else:
+            # 更新光标
+            pos = event.pos()
+            edges = 0
+            if pos.x() < self.EDGE_SIZE:
+                edges |= Qt.LeftEdge
+            if pos.x() > self.width() - self.EDGE_SIZE:
+                edges |= Qt.RightEdge
+            if pos.y() < self.EDGE_SIZE:
+                edges |= Qt.TopEdge
+            if pos.y() > self.height() - self.EDGE_SIZE:
+                edges |= Qt.BottomEdge
+
+            if edges:
+                if edges & Qt.LeftEdge and edges & Qt.TopEdge:
+                    self.setCursor(Qt.SizeFDiagCursor)
+                elif edges & Qt.RightEdge and edges & Qt.BottomEdge:
+                    self.setCursor(Qt.SizeFDiagCursor)
+                elif edges & Qt.LeftEdge and edges & Qt.BottomEdge:
+                    self.setCursor(Qt.SizeBDiagCursor)
+                elif edges & Qt.RightEdge and edges & Qt.TopEdge:
+                    self.setCursor(Qt.SizeBDiagCursor)
+                elif edges & Qt.LeftEdge or edges & Qt.RightEdge:
+                    self.setCursor(Qt.SizeHorCursor)
+                elif edges & Qt.TopEdge or edges & Qt.BottomEdge:
+                    self.setCursor(Qt.SizeVerCursor)
+                self._edge = edges
+            else:
+                self.setCursor(Qt.ArrowCursor)
+                self._edge = None
+
+    def mouseReleaseEvent(self, event: QMouseEvent):
+        self._dragging = False
+        self._edge = None
+
+
+class GlassCard(QFrame):
+    """玻璃效果卡片"""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setup_style()
+
+    def setup_style(self):
         self.setStyleSheet(f"""
             QFrame {{
-                background-color: {COLORS['surface']};
-                border-radius: 16px;
+                background-color: {COLORS['bg_card']};
                 border: 1px solid {COLORS['border']};
+                border-radius: 16px;
             }}
         """)
 
 
 class SidebarButton(QPushButton):
-    """侧边栏按钮 - Swiss Modernism 风格"""
+    """侧边栏按钮"""
 
     def __init__(self, icon, text, parent=None):
         super().__init__(parent)
@@ -72,21 +159,24 @@ class SidebarButton(QPushButton):
         self.setText(f"{icon}  {text}")
         self.setCheckable(True)
         self.setCursor(Qt.PointingHandCursor)
-        self.setFixedHeight(44)
+        self.setFixedHeight(48)
+        self.setup_style()
+
+    def setup_style(self):
         self.setStyleSheet(f"""
             QPushButton {{
                 background-color: transparent;
-                color: {COLORS['text_muted']};
+                color: {COLORS['text_secondary']};
                 border: none;
-                padding: 0 16px;
+                padding: 0 20px;
                 text-align: left;
-                border-radius: 10px;
+                border-radius: 12px;
                 font-size: 14px;
                 font-weight: 500;
             }}
             QPushButton:hover {{
-                background-color: {COLORS['background']};
-                color: {COLORS['text']};
+                background-color: {COLORS['bg_hover']};
+                color: {COLORS['text_primary']};
             }}
             QPushButton:checked {{
                 background-color: {COLORS['primary_light']};
@@ -104,9 +194,6 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Terminal AI")
         self.setMinimumSize(1100, 700)
         self.resize(1280, 800)
-        # 设置窗口圆角
-        self.setWindowFlags(Qt.FramelessWindowHint)
-        self.setAttribute(Qt.WA_TranslucentBackground)
 
         # 窗口拖拽相关
         self._drag_position = None
@@ -114,13 +201,15 @@ class MainWindow(QMainWindow):
         self.setup_ui()
 
     def mousePressEvent(self, event: QMouseEvent):
-        """鼠标按下事件"""
+        """鼠标按下事件 - 用于拖动窗口"""
         if event.button() == Qt.LeftButton:
-            self._drag_position = event.globalPos() - self.frameGeometry().topLeft()
-            event.accept()
+            # 只在标题栏区域允许拖动
+            if event.y() < 60:
+                self._drag_position = event.globalPos() - self.frameGeometry().topLeft()
+                event.accept()
 
     def mouseMoveEvent(self, event: QMouseEvent):
-        """鼠标移动事件"""
+        """鼠标移动事件 - 用于拖动窗口"""
         if event.buttons() == Qt.LeftButton and self._drag_position:
             self.move(event.globalPos() - self._drag_position)
             event.accept()
@@ -143,16 +232,16 @@ class MainWindow(QMainWindow):
         super().keyPressEvent(event)
 
     def setup_ui(self):
-        # 设置应用字体 - Poppins + Open Sans
+        # 设置应用字体
         font = QFont("Segoe UI, -apple-system, BlinkMacSystemFont, Roboto, sans-serif", 11)
         QApplication.setFont(font)
 
-        # 主容器（带圆角）
-        main_container = QWidget()
+        # 主容器
+        main_container = ResizableFrame()
         main_container.setStyleSheet(f"""
-            QWidget {{
-                background-color: {COLORS['surface']};
-                border-radius: 16px;
+            QFrame {{
+                background-color: {COLORS['bg_primary']};
+                border-radius: 0px;
                 border: 1px solid {COLORS['border']};
             }}
         """)
@@ -165,26 +254,24 @@ class MainWindow(QMainWindow):
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
 
-        # 自定义标题栏
+        # 标题栏
         title_bar = QFrame()
-        title_bar.setFixedHeight(44)
+        title_bar.setFixedHeight(60)
         title_bar.setStyleSheet(f"""
             QFrame {{
-                background-color: {COLORS['surface']};
-                border-top-left-radius: 16px;
-                border-top-right-radius: 16px;
+                background-color: {COLORS['bg_secondary']};
                 border-bottom: 1px solid {COLORS['border']};
             }}
         """)
         title_bar_layout = QHBoxLayout(title_bar)
-        title_bar_layout.setContentsMargins(16, 0, 8, 0)
+        title_bar_layout.setContentsMargins(20, 0, 12, 0)
 
         # 窗口标题
         title_label = QLabel("Terminal AI")
         title_label.setStyleSheet(f"""
             QLabel {{
-                color: {COLORS['text']};
-                font-size: 13px;
+                color: {COLORS['text_primary']};
+                font-size: 16px;
                 font-weight: 600;
             }}
         """)
@@ -193,55 +280,55 @@ class MainWindow(QMainWindow):
 
         # 窗口控制按钮
         minimize_btn = QPushButton("─")
-        minimize_btn.setFixedSize(32, 32)
+        minimize_btn.setFixedSize(36, 36)
         minimize_btn.setStyleSheet(f"""
             QPushButton {{
                 background-color: transparent;
-                color: {COLORS['text_muted']};
+                color: {COLORS['text_secondary']};
                 border: none;
                 border-radius: 8px;
                 font-size: 14px;
                 font-weight: bold;
             }}
             QPushButton:hover {{
-                background-color: {COLORS['background']};
-                color: {COLORS['text']};
+                background-color: {COLORS['bg_hover']};
+                color: {COLORS['text_primary']};
             }}
         """)
         minimize_btn.clicked.connect(self.showMinimized)
 
         maximize_btn = QPushButton("□")
-        maximize_btn.setFixedSize(32, 32)
+        maximize_btn.setFixedSize(36, 36)
         maximize_btn.setStyleSheet(f"""
             QPushButton {{
                 background-color: transparent;
-                color: {COLORS['text_muted']};
+                color: {COLORS['text_secondary']};
                 border: none;
                 border-radius: 8px;
                 font-size: 14px;
                 font-weight: bold;
             }}
             QPushButton:hover {{
-                background-color: {COLORS['background']};
-                color: {COLORS['text']};
+                background-color: {COLORS['bg_hover']};
+                color: {COLORS['text_primary']};
             }}
         """)
         maximize_btn.clicked.connect(self.toggle_maximize)
 
         close_btn = QPushButton("✕")
-        close_btn.setFixedSize(32, 32)
+        close_btn.setFixedSize(36, 36)
         close_btn.setStyleSheet(f"""
             QPushButton {{
                 background-color: transparent;
-                color: {COLORS['text_muted']};
+                color: {COLORS['text_secondary']};
                 border: none;
                 border-radius: 8px;
                 font-size: 14px;
                 font-weight: bold;
             }}
             QPushButton:hover {{
-                background-color: {COLORS['danger_light']};
-                color: {COLORS['danger']};
+                background-color: {COLORS['danger']};
+                color: {COLORS['text_primary']};
             }}
         """)
         close_btn.clicked.connect(self.close)
@@ -260,10 +347,10 @@ class MainWindow(QMainWindow):
 
         # 侧边栏
         sidebar = QFrame()
-        sidebar.setFixedWidth(260)
+        sidebar.setFixedWidth(280)
         sidebar.setStyleSheet(f"""
             QFrame {{
-                background-color: {COLORS['surface']};
+                background-color: {COLORS['bg_secondary']};
                 border-right: 1px solid {COLORS['border']};
             }}
         """)
@@ -273,7 +360,7 @@ class MainWindow(QMainWindow):
 
         # Logo 区域
         logo_widget = QWidget()
-        logo_widget.setStyleSheet(f"background-color: {COLORS['surface']};")
+        logo_widget.setStyleSheet(f"background-color: {COLORS['bg_secondary']};")
         logo_layout = QVBoxLayout(logo_widget)
         logo_layout.setContentsMargins(24, 24, 24, 20)
 
@@ -281,7 +368,7 @@ class MainWindow(QMainWindow):
         logo_label.setStyleSheet(f"""
             QLabel {{
                 color: {COLORS['primary']};
-                font-size: 20px;
+                font-size: 22px;
                 font-weight: 700;
                 letter-spacing: -0.5px;
             }}
@@ -308,11 +395,11 @@ class MainWindow(QMainWindow):
 
         self.nav_buttons = []
         nav_items = [
-            ("📊", "API 测试"),
+            ("🚀", "API 测试"),
             ("⚙️", "配置管理"),
             ("🛡️", "命令管理"),
             ("📜", "历史记录"),
-            ("📈", "使用统计"),
+            ("📊", "使用统计"),
         ]
 
         for icon, title in nav_items:
@@ -326,17 +413,18 @@ class MainWindow(QMainWindow):
         exit_btn = QPushButton("退出应用")
         exit_btn.setStyleSheet(f"""
             QPushButton {{
-                background-color: {COLORS['danger_light']};
+                background-color: transparent;
                 color: {COLORS['danger']};
-                border: none;
+                border: 1px solid {COLORS['border']};
                 padding: 12px 20px;
-                border-radius: 10px;
+                border-radius: 12px;
                 font-size: 14px;
                 font-weight: 500;
             }}
             QPushButton:hover {{
                 background-color: {COLORS['danger']};
-                color: {COLORS['surface']};
+                color: {COLORS['text_primary']};
+                border-color: {COLORS['danger']};
             }}
         """)
         exit_btn.setCursor(Qt.PointingHandCursor)
@@ -349,7 +437,7 @@ class MainWindow(QMainWindow):
         right_content = QWidget()
         right_content.setStyleSheet(f"""
             QWidget {{
-                background-color: {COLORS['background']};
+                background-color: {COLORS['bg_primary']};
             }}
         """)
         right_layout = QVBoxLayout(right_content)
@@ -360,7 +448,7 @@ class MainWindow(QMainWindow):
         header = QFrame()
         header.setStyleSheet(f"""
             QFrame {{
-                background-color: {COLORS['surface']};
+                background-color: {COLORS['bg_primary']};
                 border-bottom: 1px solid {COLORS['border']};
             }}
         """)
@@ -371,7 +459,7 @@ class MainWindow(QMainWindow):
         self.page_title = QLabel("API 测试")
         self.page_title.setStyleSheet(f"""
             QLabel {{
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
                 font-size: 20px;
                 font-weight: 600;
             }}
@@ -412,17 +500,15 @@ class MainWindow(QMainWindow):
 
         main_layout.addWidget(content_container)
 
-        # 状态栏（添加到右侧内容区域底部）
+        # 状态栏
         self.status_bar = QStatusBar()
         self.status_bar.setStyleSheet(f"""
             QStatusBar {{
-                background-color: {COLORS['surface']};
+                background-color: {COLORS['bg_secondary']};
                 color: {COLORS['text_muted']};
                 border-top: 1px solid {COLORS['border']};
                 font-size: 12px;
                 padding: 4px;
-                border-bottom-left-radius: 16px;
-                border-bottom-right-radius: 16px;
             }}
         """)
         right_layout.addWidget(self.status_bar)
@@ -466,10 +552,10 @@ def main():
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
 
-    # 现代化样式 - SaaS 风格
+    # Glassmorphism Dark Mode 全局样式
     app.setStyleSheet(f"""
         QMainWindow {{
-            background-color: {COLORS['background']};
+            background-color: {COLORS['bg_primary']};
         }}
 
         QGroupBox {{
@@ -478,22 +564,22 @@ def main():
             border-radius: 12px;
             margin-top: 12px;
             padding-top: 16px;
-            background-color: {COLORS['surface']};
-            color: {COLORS['text']};
+            background-color: {COLORS['bg_card']};
+            color: {COLORS['text_primary']};
         }}
 
         QGroupBox::title {{
             subcontrol-origin: margin;
             left: 16px;
             padding: 0 8px;
-            color: {COLORS['text']};
+            color: {COLORS['text_primary']};
             font-size: 14px;
         }}
 
         QPushButton {{
             padding: 10px 20px;
             background-color: {COLORS['primary']};
-            color: {COLORS['surface']};
+            color: {COLORS['text_primary']};
             border: none;
             border-radius: 8px;
             font-weight: 500;
@@ -517,25 +603,54 @@ def main():
             padding: 10px 14px;
             border: 1px solid {COLORS['border']};
             border-radius: 8px;
-            background-color: {COLORS['surface']};
-            color: {COLORS['text']};
+            background-color: {COLORS['bg_input']};
+            color: {COLORS['text_primary']};
             font-size: 14px;
+            selection-background-color: {COLORS['primary_light']};
+            selection-color: {COLORS['primary']};
         }}
 
         QLineEdit:focus, QTextEdit:focus, QComboBox:focus {{
-            border: 2px solid {COLORS['primary']};
-            background-color: {COLORS['surface']};
+            border: 2px solid {COLORS['border_focus']};
+            background-color: {COLORS['bg_input']};
         }}
 
         QLineEdit:hover, QTextEdit:hover, QComboBox:hover {{
-            border-color: {COLORS['border_hover']};
+            border-color: {COLORS['border_light']};
+        }}
+
+        QComboBox {{
+            padding: 10px 30px 10px 14px;
+        }}
+
+        QComboBox::drop-down {{
+            border: none;
+            width: 20px;
+            padding-right: 8px;
+        }}
+
+        QComboBox::down-arrow {{
+            image: none;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid {COLORS['text_secondary']};
+        }}
+
+        QComboBox QAbstractItemView {{
+            background-color: {COLORS['bg_secondary']};
+            border: 1px solid {COLORS['border']};
+            border-radius: 8px;
+            selection-background-color: {COLORS['primary_light']};
+            selection-color: {COLORS['primary']};
+            color: {COLORS['text_primary']};
+            padding: 4px;
         }}
 
         QListWidget {{
             border: 1px solid {COLORS['border']};
             border-radius: 12px;
-            background-color: {COLORS['surface']};
-            color: {COLORS['text']};
+            background-color: {COLORS['bg_card']};
+            color: {COLORS['text_primary']};
             font-size: 14px;
             outline: none;
         }}
@@ -543,11 +658,11 @@ def main():
         QListWidget::item {{
             padding: 12px 16px;
             border-bottom: 1px solid {COLORS['border']};
-            color: {COLORS['text']};
+            color: {COLORS['text_primary']};
         }}
 
         QListWidget::item:hover {{
-            background-color: {COLORS['background']};
+            background-color: {COLORS['bg_hover']};
         }}
 
         QListWidget::item:selected {{
@@ -558,9 +673,9 @@ def main():
         QTableWidget {{
             border: 1px solid {COLORS['border']};
             border-radius: 12px;
-            background-color: {COLORS['surface']};
+            background-color: {COLORS['bg_card']};
             gridline-color: {COLORS['border']};
-            color: {COLORS['text']};
+            color: {COLORS['text_primary']};
             font-size: 14px;
             outline: none;
         }}
@@ -568,11 +683,11 @@ def main():
         QTableWidget::item {{
             padding: 12px;
             border-bottom: 1px solid {COLORS['border']};
-            color: {COLORS['text']};
+            color: {COLORS['text_primary']};
         }}
 
         QTableWidget::item:hover {{
-            background-color: {COLORS['background']};
+            background-color: {COLORS['bg_hover']};
         }}
 
         QTableWidget::item:selected {{
@@ -581,8 +696,8 @@ def main():
         }}
 
         QHeaderView::section {{
-            background-color: {COLORS['background']};
-            color: {COLORS['text_muted']};
+            background-color: {COLORS['bg_secondary']};
+            color: {COLORS['text_secondary']};
             padding: 12px;
             border: none;
             border-right: 1px solid {COLORS['border']};
@@ -602,11 +717,11 @@ def main():
         QTabWidget::pane {{
             border: 1px solid {COLORS['border']};
             border-radius: 12px;
-            background-color: {COLORS['surface']};
+            background-color: {COLORS['bg_card']};
         }}
 
         QTabBar::tab {{
-            background-color: {COLORS['background']};
+            background-color: {COLORS['bg_secondary']};
             color: {COLORS['text_muted']};
             padding: 10px 20px;
             border-top-left-radius: 8px;
@@ -617,13 +732,13 @@ def main():
         }}
 
         QTabBar::tab:selected {{
-            background-color: {COLORS['surface']};
+            background-color: {COLORS['bg_card']};
             color: {COLORS['primary']};
             border-bottom: 2px solid {COLORS['primary']};
         }}
 
         QTabBar::tab:hover:!selected {{
-            background-color: {COLORS['border']};
+            background-color: {COLORS['bg_hover']};
         }}
 
         QScrollArea {{
@@ -632,12 +747,12 @@ def main():
         }}
 
         QLabel {{
-            color: {COLORS['text']};
+            color: {COLORS['text_primary']};
             font-size: 14px;
         }}
 
         QCheckBox {{
-            color: {COLORS['text']};
+            color: {COLORS['text_primary']};
             font-size: 14px;
             spacing: 8px;
         }}
@@ -647,7 +762,7 @@ def main():
             height: 18px;
             border: 2px solid {COLORS['border']};
             border-radius: 4px;
-            background-color: {COLORS['surface']};
+            background-color: {COLORS['bg_input']};
         }}
 
         QCheckBox::indicator:checked {{
@@ -656,7 +771,7 @@ def main():
         }}
 
         QCheckBox::indicator:hover {{
-            border-color: {COLORS['border_hover']};
+            border-color: {COLORS['border_light']};
         }}
 
         QProgressBar {{
@@ -665,13 +780,13 @@ def main():
             background-color: {COLORS['border']};
             text-align: center;
             font-size: 13px;
-            color: {COLORS['text']};
+            color: {COLORS['text_primary']};
             height: 24px;
         }}
 
         QProgressBar::chunk {{
             background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
-                stop:0 {COLORS['primary']}, stop:1 {COLORS['secondary']});
+                stop:0 {COLORS['primary']}, stop:1 {COLORS['accent']});
             border-radius: 8px;
         }}
 
@@ -690,7 +805,7 @@ def main():
         }}
 
         QScrollBar::handle:vertical:hover {{
-            background-color: {COLORS['border_hover']};
+            background-color: {COLORS['border_light']};
         }}
 
         QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
@@ -712,7 +827,7 @@ def main():
         }}
 
         QScrollBar::handle:horizontal:hover {{
-            background-color: {COLORS['border_hover']};
+            background-color: {COLORS['border_light']};
         }}
 
         QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{
@@ -724,18 +839,30 @@ def main():
         }}
 
         QFormLayout QLabel {{
-            color: {COLORS['text']};
+            color: {COLORS['text_primary']};
             font-size: 13px;
             font-weight: 500;
         }}
 
         QMessageBox {{
-            background-color: {COLORS['surface']};
+            background-color: {COLORS['bg_secondary']};
+            color: {COLORS['text_primary']};
         }}
 
         QMessageBox QPushButton {{
             min-width: 80px;
             padding: 8px 16px;
+            background-color: {COLORS['primary']};
+            color: {COLORS['text_primary']};
+        }}
+
+        QMessageBox QPushButton:hover {{
+            background-color: {COLORS['primary_hover']};
+        }}
+
+        QDialog {{
+            background-color: {COLORS['bg_secondary']};
+            color: {COLORS['text_primary']};
         }}
     """)
 

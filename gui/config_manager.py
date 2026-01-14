@@ -1,5 +1,5 @@
 """
-配置管理界面 - 基于 Soft UI Evolution 风格
+配置管理界面 - Glassmorphism + Dark Mode 设计
 """
 
 import json
@@ -10,7 +10,7 @@ try:
     from PyQt5.QtWidgets import (
         QWidget, QVBoxLayout, QHBoxLayout, QListWidget, QPushButton,
         QLabel, QLineEdit, QFormLayout, QDialog, QMessageBox, QComboBox,
-        QSpinBox, QDoubleSpinBox, QGroupBox
+        QSpinBox, QDoubleSpinBox, QGroupBox, QFrame
     )
     from PyQt5.QtCore import Qt, pyqtSignal
 except ImportError:
@@ -18,23 +18,28 @@ except ImportError:
     print("运行: pip install PyQt5")
     raise
 
-# SaaS 配色方案
+# Glassmorphism Dark Mode 配色方案
 COLORS = {
-    'primary': '#2563EB',
-    'primary_hover': '#1D4ED8',
-    'primary_light': '#DBEAFE',
-    'secondary': '#3B82F6',
-    'background': '#F8FAFC',
-    'surface': '#FFFFFF',
-    'text': '#1E293B',
+    'bg_primary': '#0F172A',
+    'bg_secondary': '#1E293B',
+    'bg_card': 'rgba(30, 41, 59, 0.8)',
+    'bg_hover': 'rgba(51, 65, 85, 0.9)',
+    'bg_input': '#1E293B',
+    'text_primary': '#F8FAFC',
+    'text_secondary': '#94A3B8',
     'text_muted': '#64748B',
-    'border': '#E2E8F0',
-    'border_hover': '#CBD5E1',
-    'danger': '#EF4444',
-    'danger_hover': '#DC2626',
-    'danger_light': '#FEE2E2',
+    'primary': '#F59E0B',
+    'primary_hover': '#D97706',
+    'primary_light': 'rgba(245, 158, 11, 0.15)',
+    'accent': '#8B5CF6',
+    'accent_hover': '#7C3AED',
+    'accent_light': 'rgba(139, 92, 246, 0.15)',
     'success': '#10B981',
+    'danger': '#EF4444',
     'warning': '#F59E0B',
+    'border': 'rgba(51, 65, 85, 0.6)',
+    'border_light': 'rgba(148, 163, 184, 0.3)',
+    'border_focus': '#F59E0B',
 }
 
 
@@ -45,7 +50,7 @@ class ConfigDialog(QDialog):
         super().__init__(parent)
         self.config = config or {}
         self.setWindowTitle("编辑配置" if config else "添加配置")
-        self.setMinimumWidth(450)
+        self.setMinimumWidth(500)
         self.setup_ui()
 
     def setup_ui(self):
@@ -57,8 +62,8 @@ class ConfigDialog(QDialog):
         title = QLabel("配置详情")
         title.setStyleSheet(f"""
             QLabel {{
-                color: {COLORS['text']};
-                font-size: 18px;
+                color: {COLORS['text_primary']};
+                font-size: 20px;
                 font-weight: 600;
             }}
         """)
@@ -72,18 +77,18 @@ class ConfigDialog(QDialog):
         self.name_edit.setPlaceholderText("配置名称")
         self.name_edit.setStyleSheet(f"""
             QLineEdit {{
-                background-color: {COLORS['surface']};
+                background-color: {COLORS['bg_input']};
                 border: 1px solid {COLORS['border']};
                 border-radius: 8px;
-                padding: 10px 14px;
+                padding: 12px 16px;
                 font-size: 14px;
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
             }}
             QLineEdit:focus {{
-                border: 2px solid {COLORS['primary']};
+                border: 2px solid {COLORS['border_focus']};
             }}
             QLineEdit:hover {{
-                border-color: {COLORS['border_hover']};
+                border-color: {COLORS['border_light']};
             }}
         """)
 
@@ -92,18 +97,18 @@ class ConfigDialog(QDialog):
         self.api_key_edit.setPlaceholderText("API Key")
         self.api_key_edit.setStyleSheet(f"""
             QLineEdit {{
-                background-color: {COLORS['surface']};
+                background-color: {COLORS['bg_input']};
                 border: 1px solid {COLORS['border']};
                 border-radius: 8px;
-                padding: 10px 14px;
+                padding: 12px 16px;
                 font-size: 14px;
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
             }}
             QLineEdit:focus {{
-                border: 2px solid {COLORS['primary']};
+                border: 2px solid {COLORS['border_focus']};
             }}
             QLineEdit:hover {{
-                border-color: {COLORS['border_hover']};
+                border-color: {COLORS['border_light']};
             }}
         """)
 
@@ -111,18 +116,18 @@ class ConfigDialog(QDialog):
         self.endpoint_edit.setPlaceholderText("https://api.example.com/v1")
         self.endpoint_edit.setStyleSheet(f"""
             QLineEdit {{
-                background-color: {COLORS['surface']};
+                background-color: {COLORS['bg_input']};
                 border: 1px solid {COLORS['border']};
                 border-radius: 8px;
-                padding: 10px 14px;
+                padding: 12px 16px;
                 font-size: 14px;
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
             }}
             QLineEdit:focus {{
-                border: 2px solid {COLORS['primary']};
+                border: 2px solid {COLORS['border_focus']};
             }}
             QLineEdit:hover {{
-                border-color: {COLORS['border_hover']};
+                border-color: {COLORS['border_light']};
             }}
         """)
 
@@ -130,18 +135,18 @@ class ConfigDialog(QDialog):
         self.model_edit.setPlaceholderText("gpt-4")
         self.model_edit.setStyleSheet(f"""
             QLineEdit {{
-                background-color: {COLORS['surface']};
+                background-color: {COLORS['bg_input']};
                 border: 1px solid {COLORS['border']};
                 border-radius: 8px;
-                padding: 10px 14px;
+                padding: 12px 16px;
                 font-size: 14px;
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
             }}
             QLineEdit:focus {{
-                border: 2px solid {COLORS['primary']};
+                border: 2px solid {COLORS['border_focus']};
             }}
             QLineEdit:hover {{
-                border-color: {COLORS['border_hover']};
+                border-color: {COLORS['border_light']};
             }}
         """)
 
@@ -150,15 +155,15 @@ class ConfigDialog(QDialog):
         self.max_tokens_spin.setValue(self.config.get("max_tokens", 2000))
         self.max_tokens_spin.setStyleSheet(f"""
             QSpinBox {{
-                background-color: {COLORS['surface']};
+                background-color: {COLORS['bg_input']};
                 border: 1px solid {COLORS['border']};
                 border-radius: 8px;
-                padding: 10px 14px;
+                padding: 12px 16px;
                 font-size: 14px;
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
             }}
             QSpinBox:focus {{
-                border: 2px solid {COLORS['primary']};
+                border: 2px solid {COLORS['border_focus']};
             }}
         """)
 
@@ -168,15 +173,15 @@ class ConfigDialog(QDialog):
         self.temperature_spin.setValue(self.config.get("temperature", 0.7))
         self.temperature_spin.setStyleSheet(f"""
             QDoubleSpinBox {{
-                background-color: {COLORS['surface']};
+                background-color: {COLORS['bg_input']};
                 border: 1px solid {COLORS['border']};
                 border-radius: 8px;
-                padding: 10px 14px;
+                padding: 12px 16px;
                 font-size: 14px;
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
             }}
             QDoubleSpinBox:focus {{
-                border: 2px solid {COLORS['primary']};
+                border: 2px solid {COLORS['border_focus']};
             }}
         """)
 
@@ -196,17 +201,17 @@ class ConfigDialog(QDialog):
         cancel_btn = QPushButton("取消")
         cancel_btn.setStyleSheet(f"""
             QPushButton {{
-                background-color: {COLORS['background']};
-                color: {COLORS['text_muted']};
+                background-color: transparent;
+                color: {COLORS['text_secondary']};
                 border: 1px solid {COLORS['border']};
                 border-radius: 8px;
-                padding: 10px 24px;
+                padding: 12px 24px;
                 font-size: 14px;
                 font-weight: 500;
             }}
             QPushButton:hover {{
                 background-color: {COLORS['border']};
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
             }}
         """)
         cancel_btn.clicked.connect(self.reject)
@@ -215,10 +220,10 @@ class ConfigDialog(QDialog):
         ok_btn.setStyleSheet(f"""
             QPushButton {{
                 background-color: {COLORS['primary']};
-                color: {COLORS['surface']};
+                color: {COLORS['text_primary']};
                 border: none;
                 border-radius: 8px;
-                padding: 10px 24px;
+                padding: 12px 24px;
                 font-size: 14px;
                 font-weight: 500;
             }}
@@ -294,8 +299,8 @@ class ConfigManager(QWidget):
         title = QLabel("配置列表")
         title.setStyleSheet(f"""
             QLabel {{
-                color: {COLORS['text']};
-                font-size: 16px;
+                color: {COLORS['text_primary']};
+                font-size: 18px;
                 font-weight: 600;
             }}
         """)
@@ -305,18 +310,20 @@ class ConfigManager(QWidget):
         self.config_list.itemDoubleClicked.connect(self.edit_config)
         self.config_list.setStyleSheet(f"""
             QListWidget {{
-                background-color: {COLORS['surface']};
+                background-color: {COLORS['bg_card']};
                 border: 1px solid {COLORS['border']};
                 border-radius: 12px;
                 font-size: 14px;
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
+                outline: none;
             }}
             QListWidget::item {{
-                padding: 12px 16px;
+                padding: 14px 18px;
                 border-bottom: 1px solid {COLORS['border']};
+                color: {COLORS['text_primary']};
             }}
             QListWidget::item:hover {{
-                background-color: {COLORS['background']};
+                background-color: {COLORS['bg_hover']};
             }}
             QListWidget::item:selected {{
                 background-color: {COLORS['primary_light']};
@@ -333,10 +340,10 @@ class ConfigManager(QWidget):
         add_btn.setStyleSheet(f"""
             QPushButton {{
                 background-color: {COLORS['primary']};
-                color: {COLORS['surface']};
+                color: {COLORS['text_primary']};
                 border: none;
                 border-radius: 8px;
-                padding: 10px 16px;
+                padding: 12px 20px;
                 font-size: 14px;
                 font-weight: 500;
             }}
@@ -349,16 +356,16 @@ class ConfigManager(QWidget):
         edit_btn = QPushButton("编辑")
         edit_btn.setStyleSheet(f"""
             QPushButton {{
-                background-color: {COLORS['background']};
-                color: {COLORS['text']};
+                background-color: transparent;
+                color: {COLORS['text_primary']};
                 border: 1px solid {COLORS['border']};
                 border-radius: 8px;
-                padding: 10px 16px;
+                padding: 12px 20px;
                 font-size: 14px;
                 font-weight: 500;
             }}
             QPushButton:hover {{
-                background-color: {COLORS['border']};
+                background-color: {COLORS['bg_hover']};
             }}
         """)
         edit_btn.clicked.connect(self.edit_config)
@@ -366,17 +373,18 @@ class ConfigManager(QWidget):
         delete_btn = QPushButton("删除")
         delete_btn.setStyleSheet(f"""
             QPushButton {{
-                background-color: {COLORS['danger_light']};
+                background-color: transparent;
                 color: {COLORS['danger']};
-                border: none;
+                border: 1px solid {COLORS['border']};
                 border-radius: 8px;
-                padding: 10px 16px;
+                padding: 12px 20px;
                 font-size: 14px;
                 font-weight: 500;
             }}
             QPushButton:hover {{
                 background-color: {COLORS['danger']};
-                color: {COLORS['surface']};
+                color: {COLORS['text_primary']};
+                border-color: {COLORS['danger']};
             }}
         """)
         delete_btn.clicked.connect(self.delete_config)
@@ -385,10 +393,10 @@ class ConfigManager(QWidget):
         test_btn.setStyleSheet(f"""
             QPushButton {{
                 background-color: {COLORS['success']};
-                color: {COLORS['surface']};
+                color: {COLORS['text_primary']};
                 border: none;
                 border-radius: 8px;
-                padding: 10px 16px;
+                padding: 12px 20px;
                 font-size: 14px;
                 font-weight: 500;
             }}
@@ -401,16 +409,16 @@ class ConfigManager(QWidget):
         set_default_btn = QPushButton("设为默认")
         set_default_btn.setStyleSheet(f"""
             QPushButton {{
-                background-color: {COLORS['background']};
-                color: {COLORS['text']};
+                background-color: transparent;
+                color: {COLORS['text_primary']};
                 border: 1px solid {COLORS['border']};
                 border-radius: 8px;
-                padding: 10px 16px;
+                padding: 12px 20px;
                 font-size: 14px;
                 font-weight: 500;
             }}
             QPushButton:hover {{
-                background-color: {COLORS['border']};
+                background-color: {COLORS['bg_hover']};
             }}
         """)
         set_default_btn.clicked.connect(self.set_default)
@@ -432,14 +440,14 @@ class ConfigManager(QWidget):
                 border-radius: 12px;
                 margin-top: 12px;
                 padding-top: 16px;
-                background-color: {COLORS['surface']};
-                color: {COLORS['text']};
+                background-color: {COLORS['bg_card']};
+                color: {COLORS['text_primary']};
             }}
             QGroupBox::title {{
                 subcontrol-origin: margin;
                 left: 16px;
                 padding: 0 8px;
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
                 font-size: 14px;
             }}
         """)
@@ -455,7 +463,7 @@ class ConfigManager(QWidget):
 
         for label in [self.detail_name, self.detail_endpoint, self.detail_model,
                       self.detail_max_tokens, self.detail_temperature, self.detail_default]:
-            label.setStyleSheet(f"color: {COLORS['text']}; font-size: 14px;")
+            label.setStyleSheet(f"color: {COLORS['text_primary']}; font-size: 14px;")
 
         right_layout.addRow("名称:", self.detail_name)
         right_layout.addRow("Endpoint:", self.detail_endpoint)

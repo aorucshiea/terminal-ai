@@ -1,6 +1,5 @@
 """
-命令管理界面 - 管理用户信任的命令
-基于 Soft UI Evolution 风格
+命令管理界面 - Glassmorphism + Dark Mode 设计
 """
 
 import sys
@@ -23,21 +22,28 @@ except ImportError:
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from command_config import command_config
 
-# SaaS 配色方案
+# Glassmorphism Dark Mode 配色方案
 COLORS = {
-    'primary': '#2563EB',
-    'primary_hover': '#1D4ED8',
-    'primary_light': '#DBEAFE',
-    'secondary': '#3B82F6',
-    'background': '#F8FAFC',
-    'surface': '#FFFFFF',
-    'text': '#1E293B',
+    'bg_primary': '#0F172A',
+    'bg_secondary': '#1E293B',
+    'bg_card': 'rgba(30, 41, 59, 0.8)',
+    'bg_hover': 'rgba(51, 65, 85, 0.9)',
+    'bg_input': '#1E293B',
+    'text_primary': '#F8FAFC',
+    'text_secondary': '#94A3B8',
     'text_muted': '#64748B',
-    'border': '#E2E8F0',
-    'border_hover': '#CBD5E1',
+    'primary': '#F59E0B',
+    'primary_hover': '#D97706',
+    'primary_light': 'rgba(245, 158, 11, 0.15)',
+    'accent': '#8B5CF6',
+    'accent_hover': '#7C3AED',
+    'accent_light': 'rgba(139, 92, 246, 0.15)',
+    'success': '#10B981',
     'danger': '#EF4444',
-    'danger_hover': '#DC2626',
-    'danger_light': '#FEE2E2',
+    'warning': '#F59E0B',
+    'border': 'rgba(51, 65, 85, 0.6)',
+    'border_light': 'rgba(148, 163, 184, 0.3)',
+    'border_focus': '#F59E0B',
 }
 
 
@@ -52,14 +58,14 @@ class CommandManager(QWidget):
     def setup_ui(self):
         """设置 UI"""
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(32, 32, 32, 32)
-        layout.setSpacing(24)
+        layout.setContentsMargins(24, 24, 24, 24)
+        layout.setSpacing(20)
 
         # 标题
         title_label = QLabel("命令管理")
         title_label.setStyleSheet(f"""
             QLabel {{
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
                 font-size: 24px;
                 font-weight: 700;
             }}
@@ -81,7 +87,7 @@ class CommandManager(QWidget):
         add_frame = QFrame()
         add_frame.setStyleSheet(f"""
             QFrame {{
-                background-color: {COLORS['surface']};
+                background-color: {COLORS['bg_card']};
                 border-radius: 12px;
                 border: 1px solid {COLORS['border']};
             }}
@@ -92,7 +98,7 @@ class CommandManager(QWidget):
         add_label = QLabel("添加命令:")
         add_label.setStyleSheet(f"""
             QLabel {{
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
                 font-size: 14px;
                 font-weight: 500;
             }}
@@ -103,18 +109,18 @@ class CommandManager(QWidget):
         self.command_input.setPlaceholderText("输入命令名称（如: git, npm, docker）")
         self.command_input.setStyleSheet(f"""
             QLineEdit {{
-                background-color: {COLORS['surface']};
+                background-color: {COLORS['bg_input']};
                 border: 1px solid {COLORS['border']};
                 border-radius: 8px;
                 padding: 10px 14px;
                 font-size: 14px;
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
             }}
             QLineEdit:focus {{
-                border: 2px solid {COLORS['primary']};
+                border: 2px solid {COLORS['border_focus']};
             }}
             QLineEdit:hover {{
-                border-color: {COLORS['border_hover']};
+                border-color: {COLORS['border_light']};
             }}
         """)
         self.command_input.returnPressed.connect(self.add_command)
@@ -125,7 +131,7 @@ class CommandManager(QWidget):
         add_btn.setStyleSheet(f"""
             QPushButton {{
                 background-color: {COLORS['primary']};
-                color: {COLORS['surface']};
+                color: {COLORS['text_primary']};
                 border: none;
                 border-radius: 8px;
                 font-size: 14px;
@@ -144,7 +150,7 @@ class CommandManager(QWidget):
         list_frame = QFrame()
         list_frame.setStyleSheet(f"""
             QFrame {{
-                background-color: {COLORS['surface']};
+                background-color: {COLORS['bg_card']};
                 border-radius: 12px;
                 border: 1px solid {COLORS['border']};
             }}
@@ -157,7 +163,7 @@ class CommandManager(QWidget):
         list_header = QLabel("信任的命令列表")
         list_header.setStyleSheet(f"""
             QLabel {{
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
                 font-size: 16px;
                 font-weight: 600;
                 padding: 20px 24px 12px 24px;
@@ -169,17 +175,19 @@ class CommandManager(QWidget):
         self.command_list = QListWidget()
         self.command_list.setStyleSheet(f"""
             QListWidget {{
-                background-color: {COLORS['surface']};
+                background-color: {COLORS['bg_card']};
                 border: none;
                 font-size: 14px;
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
+                outline: none;
             }}
             QListWidget::item {{
                 padding: 12px 24px;
                 border-bottom: 1px solid {COLORS['border']};
+                color: {COLORS['text_primary']};
             }}
             QListWidget::item:hover {{
-                background-color: {COLORS['background']};
+                background-color: {COLORS['bg_hover']};
             }}
             QListWidget::item:selected {{
                 background-color: {COLORS['primary_light']};
@@ -197,14 +205,14 @@ class CommandManager(QWidget):
         remove_btn.setStyleSheet(f"""
             QPushButton {{
                 background-color: {COLORS['danger']};
-                color: {COLORS['surface']};
+                color: {COLORS['text_primary']};
                 border: none;
                 border-radius: 8px;
                 font-size: 14px;
                 font-weight: 500;
             }}
             QPushButton:hover {{
-                background-color: {COLORS['danger_hover']};
+                background-color: #DC2626;
             }}
         """)
         remove_btn.clicked.connect(self.remove_command)
@@ -216,16 +224,15 @@ class CommandManager(QWidget):
         clear_btn.setFixedSize(120, 40)
         clear_btn.setStyleSheet(f"""
             QPushButton {{
-                background-color: {COLORS['background']};
-                color: {COLORS['text_muted']};
+                background-color: transparent;
+                color: {COLORS['text_primary']};
                 border: 1px solid {COLORS['border']};
                 border-radius: 8px;
                 font-size: 14px;
                 font-weight: 500;
             }}
             QPushButton:hover {{
-                background-color: {COLORS['border']};
-                color: {COLORS['text']};
+                background-color: {COLORS['bg_hover']};
             }}
         """)
         clear_btn.clicked.connect(self.clear_commands)
@@ -238,7 +245,7 @@ class CommandManager(QWidget):
         history_frame = QFrame()
         history_frame.setStyleSheet(f"""
             QFrame {{
-                background-color: {COLORS['surface']};
+                background-color: {COLORS['bg_card']};
                 border-radius: 12px;
                 border: 1px solid {COLORS['border']};
             }}
@@ -249,7 +256,7 @@ class CommandManager(QWidget):
         history_header = QLabel("添加历史")
         history_header.setStyleSheet(f"""
             QLabel {{
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
                 font-size: 16px;
                 font-weight: 600;
                 padding: 20px 24px 12px 24px;
@@ -260,14 +267,19 @@ class CommandManager(QWidget):
         self.history_list = QListWidget()
         self.history_list.setStyleSheet(f"""
             QListWidget {{
-                background-color: {COLORS['surface']};
+                background-color: {COLORS['bg_card']};
                 border: none;
                 font-size: 13px;
                 color: {COLORS['text_muted']};
+                outline: none;
             }}
             QListWidget::item {{
                 padding: 10px 24px;
                 border-bottom: 1px solid {COLORS['border']};
+                color: {COLORS['text_muted']};
+            }}
+            QListWidget::item:hover {{
+                background-color: {COLORS['bg_hover']};
             }}
         """)
         history_layout.addWidget(self.history_list)

@@ -1,5 +1,5 @@
 """
-历史记录界面 - 基于 Soft UI Evolution 风格
+历史记录界面 - Glassmorphism + Dark Mode 设计
 """
 
 import json
@@ -19,23 +19,28 @@ except ImportError:
     print("运行: pip install PyQt5")
     raise
 
-# SaaS 配色方案
+# Glassmorphism Dark Mode 配色方案
 COLORS = {
-    'primary': '#2563EB',
-    'primary_hover': '#1D4ED8',
-    'primary_light': '#DBEAFE',
-    'secondary': '#3B82F6',
-    'background': '#F8FAFC',
-    'surface': '#FFFFFF',
-    'text': '#1E293B',
+    'bg_primary': '#0F172A',
+    'bg_secondary': '#1E293B',
+    'bg_card': 'rgba(30, 41, 59, 0.8)',
+    'bg_hover': 'rgba(51, 65, 85, 0.9)',
+    'bg_input': '#1E293B',
+    'text_primary': '#F8FAFC',
+    'text_secondary': '#94A3B8',
     'text_muted': '#64748B',
-    'border': '#E2E8F0',
-    'border_hover': '#CBD5E1',
-    'danger': '#EF4444',
-    'danger_hover': '#DC2626',
-    'danger_light': '#FEE2E2',
+    'primary': '#F59E0B',
+    'primary_hover': '#D97706',
+    'primary_light': 'rgba(245, 158, 11, 0.15)',
+    'accent': '#8B5CF6',
+    'accent_hover': '#7C3AED',
+    'accent_light': 'rgba(139, 92, 246, 0.15)',
     'success': '#10B981',
+    'danger': '#EF4444',
     'warning': '#F59E0B',
+    'border': 'rgba(51, 65, 85, 0.6)',
+    'border_light': 'rgba(148, 163, 184, 0.3)',
+    'border_focus': '#F59E0B',
 }
 
 
@@ -63,8 +68,8 @@ class HistoryWidget(QWidget):
         title = QLabel("历史记录")
         title.setStyleSheet(f"""
             QLabel {{
-                color: {COLORS['text']};
-                font-size: 16px;
+                color: {COLORS['text_primary']};
+                font-size: 18px;
                 font-weight: 600;
             }}
         """)
@@ -79,14 +84,14 @@ class HistoryWidget(QWidget):
                 border-radius: 12px;
                 margin-top: 12px;
                 padding-top: 16px;
-                background-color: {COLORS['surface']};
-                color: {COLORS['text']};
+                background-color: {COLORS['bg_card']};
+                color: {COLORS['text_primary']};
             }}
             QGroupBox::title {{
                 subcontrol-origin: margin;
                 left: 16px;
                 padding: 0 8px;
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
                 font-size: 14px;
             }}
         """)
@@ -98,24 +103,44 @@ class HistoryWidget(QWidget):
         row1.setSpacing(12)
 
         filter_label = QLabel("配置:")
-        filter_label.setStyleSheet(f"color: {COLORS['text']}; font-size: 14px; font-weight: 500;")
+        filter_label.setStyleSheet(f"color: {COLORS['text_primary']}; font-size: 14px; font-weight: 500;")
         row1.addWidget(filter_label)
 
         self.config_filter = QComboBox()
         self.config_filter.setStyleSheet(f"""
             QComboBox {{
-                background-color: {COLORS['surface']};
+                background-color: {COLORS['bg_input']};
                 border: 1px solid {COLORS['border']};
                 border-radius: 8px;
-                padding: 8px 12px;
+                padding: 10px 30px 10px 14px;
                 font-size: 14px;
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
             }}
             QComboBox:focus {{
-                border: 2px solid {COLORS['primary']};
+                border: 2px solid {COLORS['border_focus']};
             }}
             QComboBox:hover {{
-                border-color: {COLORS['border_hover']};
+                border-color: {COLORS['border_light']};
+            }}
+            QComboBox::drop-down {{
+                border: none;
+                width: 20px;
+                padding-right: 8px;
+            }}
+            QComboBox::down-arrow {{
+                image: none;
+                border-left: 5px solid transparent;
+                border-right: 5px solid transparent;
+                border-top: 5px solid {COLORS['text_secondary']};
+            }}
+            QComboBox QAbstractItemView {{
+                background-color: {COLORS['bg_secondary']};
+                border: 1px solid {COLORS['border']};
+                border-radius: 8px;
+                selection-background-color: {COLORS['primary_light']};
+                selection-color: {COLORS['primary']};
+                color: {COLORS['text_primary']};
+                padding: 4px;
             }}
         """)
         self.config_filter.addItem("全部配置")
@@ -127,18 +152,18 @@ class HistoryWidget(QWidget):
         self.search_input.setPlaceholderText("搜索消息或响应...")
         self.search_input.setStyleSheet(f"""
             QLineEdit {{
-                background-color: {COLORS['surface']};
+                background-color: {COLORS['bg_input']};
                 border: 1px solid {COLORS['border']};
                 border-radius: 8px;
                 padding: 10px 14px;
                 font-size: 14px;
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
             }}
             QLineEdit:focus {{
-                border: 2px solid {COLORS['primary']};
+                border: 2px solid {COLORS['border_focus']};
             }}
             QLineEdit:hover {{
-                border-color: {COLORS['border_hover']};
+                border-color: {COLORS['border_light']};
             }}
         """)
         self.search_input.textChanged.connect(self.apply_filter)
@@ -152,18 +177,20 @@ class HistoryWidget(QWidget):
         self.history_list.currentRowChanged.connect(self.show_detail)
         self.history_list.setStyleSheet(f"""
             QListWidget {{
-                background-color: {COLORS['surface']};
+                background-color: {COLORS['bg_card']};
                 border: 1px solid {COLORS['border']};
                 border-radius: 12px;
                 font-size: 14px;
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
+                outline: none;
             }}
             QListWidget::item {{
                 padding: 12px 16px;
                 border-bottom: 1px solid {COLORS['border']};
+                color: {COLORS['text_primary']};
             }}
             QListWidget::item:hover {{
-                background-color: {COLORS['background']};
+                background-color: {COLORS['bg_hover']};
             }}
             QListWidget::item:selected {{
                 background-color: {COLORS['primary_light']};
@@ -179,16 +206,16 @@ class HistoryWidget(QWidget):
         refresh_btn = QPushButton("刷新")
         refresh_btn.setStyleSheet(f"""
             QPushButton {{
-                background-color: {COLORS['background']};
-                color: {COLORS['text']};
+                background-color: transparent;
+                color: {COLORS['text_primary']};
                 border: 1px solid {COLORS['border']};
                 border-radius: 8px;
-                padding: 10px 20px;
+                padding: 12px 20px;
                 font-size: 14px;
                 font-weight: 500;
             }}
             QPushButton:hover {{
-                background-color: {COLORS['border']};
+                background-color: {COLORS['bg_hover']};
             }}
         """)
         refresh_btn.clicked.connect(self.load_history)
@@ -196,17 +223,18 @@ class HistoryWidget(QWidget):
         clear_btn = QPushButton("清空历史")
         clear_btn.setStyleSheet(f"""
             QPushButton {{
-                background-color: {COLORS['danger_light']};
+                background-color: transparent;
                 color: {COLORS['danger']};
-                border: none;
+                border: 1px solid {COLORS['border']};
                 border-radius: 8px;
-                padding: 10px 20px;
+                padding: 12px 20px;
                 font-size: 14px;
                 font-weight: 500;
             }}
             QPushButton:hover {{
                 background-color: {COLORS['danger']};
-                color: {COLORS['surface']};
+                color: {COLORS['text_primary']};
+                border-color: {COLORS['danger']};
             }}
         """)
         clear_btn.clicked.connect(self.clear_history)
@@ -225,14 +253,14 @@ class HistoryWidget(QWidget):
                 border-radius: 12px;
                 margin-top: 12px;
                 padding-top: 16px;
-                background-color: {COLORS['surface']};
-                color: {COLORS['text']};
+                background-color: {COLORS['bg_card']};
+                color: {COLORS['text_primary']};
             }}
             QGroupBox::title {{
                 subcontrol-origin: margin;
                 left: 16px;
                 padding: 0 8px;
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
                 font-size: 14px;
             }}
         """)
@@ -241,14 +269,14 @@ class HistoryWidget(QWidget):
         right_layout.setSpacing(16)
 
         self.detail_time = QLabel("时间: -")
-        self.detail_time.setStyleSheet(f"color: {COLORS['text']}; font-size: 14px;")
+        self.detail_time.setStyleSheet(f"color: {COLORS['text_primary']}; font-size: 14px;")
         self.detail_config = QLabel("配置: -")
-        self.detail_config.setStyleSheet(f"color: {COLORS['text']}; font-size: 14px;")
+        self.detail_config.setStyleSheet(f"color: {COLORS['text_primary']}; font-size: 14px;")
         right_layout.addWidget(self.detail_time)
         right_layout.addWidget(self.detail_config)
 
         msg_label = QLabel("消息:")
-        msg_label.setStyleSheet(f"color: {COLORS['text']}; font-size: 14px; font-weight: 500;")
+        msg_label.setStyleSheet(f"color: {COLORS['text_primary']}; font-size: 14px; font-weight: 500;")
         right_layout.addWidget(msg_label)
 
         self.detail_message = QTextEdit()
@@ -256,30 +284,30 @@ class HistoryWidget(QWidget):
         self.detail_message.setMaximumHeight(150)
         self.detail_message.setStyleSheet(f"""
             QTextEdit {{
-                background-color: {COLORS['background']};
+                background-color: {COLORS['bg_input']};
                 border: 1px solid {COLORS['border']};
                 border-radius: 8px;
                 padding: 12px 14px;
                 font-size: 14px;
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
             }}
         """)
         right_layout.addWidget(self.detail_message)
 
         resp_label = QLabel("响应:")
-        resp_label.setStyleSheet(f"color: {COLORS['text']}; font-size: 14px; font-weight: 500;")
+        resp_label.setStyleSheet(f"color: {COLORS['text_primary']}; font-size: 14px; font-weight: 500;")
         right_layout.addWidget(resp_label)
 
         self.detail_response = QTextEdit()
         self.detail_response.setReadOnly(True)
         self.detail_response.setStyleSheet(f"""
             QTextEdit {{
-                background-color: {COLORS['background']};
+                background-color: {COLORS['bg_input']};
                 border: 1px solid {COLORS['border']};
                 border-radius: 8px;
                 padding: 12px 14px;
                 font-size: 14px;
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
             }}
         """)
         right_layout.addWidget(self.detail_response)
@@ -393,6 +421,6 @@ class HistoryWidget(QWidget):
             self.history = []
             self.filtered_history = []
             with open(self.history_file, "w", encoding="utf-8") as f:
-                json.dump({"history": []}, f, indent=2)
+                json.dump({"history": []}, f)
             self.refresh_list()
             self.show_detail(-1)

@@ -1,5 +1,5 @@
 """
-API 测试界面 - 基于 Soft UI Evolution 风格
+API 测试界面 - Glassmorphism + Dark Mode 设计
 """
 
 import json
@@ -19,23 +19,28 @@ except ImportError:
     print("运行: pip install PyQt5")
     raise
 
-# SaaS 配色方案
+# Glassmorphism Dark Mode 配色方案
 COLORS = {
-    'primary': '#2563EB',
-    'primary_hover': '#1D4ED8',
-    'primary_light': '#DBEAFE',
-    'secondary': '#3B82F6',
-    'background': '#F8FAFC',
-    'surface': '#FFFFFF',
-    'text': '#1E293B',
+    'bg_primary': '#0F172A',
+    'bg_secondary': '#1E293B',
+    'bg_card': 'rgba(30, 41, 59, 0.8)',
+    'bg_hover': 'rgba(51, 65, 85, 0.9)',
+    'bg_input': '#1E293B',
+    'text_primary': '#F8FAFC',
+    'text_secondary': '#94A3B8',
     'text_muted': '#64748B',
-    'border': '#E2E8F0',
-    'border_hover': '#CBD5E1',
-    'danger': '#EF4444',
-    'danger_hover': '#DC2626',
-    'danger_light': '#FEE2E2',
+    'primary': '#F59E0B',
+    'primary_hover': '#D97706',
+    'primary_light': 'rgba(245, 158, 11, 0.15)',
+    'accent': '#8B5CF6',
+    'accent_hover': '#7C3AED',
+    'accent_light': 'rgba(139, 92, 246, 0.15)',
     'success': '#10B981',
+    'danger': '#EF4444',
     'warning': '#F59E0B',
+    'border': 'rgba(51, 65, 85, 0.6)',
+    'border_light': 'rgba(148, 163, 184, 0.3)',
+    'border_focus': '#F59E0B',
 }
 
 
@@ -112,14 +117,14 @@ class APITester(QWidget):
                 border-radius: 12px;
                 margin-top: 12px;
                 padding-top: 16px;
-                background-color: {COLORS['surface']};
-                color: {COLORS['text']};
+                background-color: {COLORS['bg_card']};
+                color: {COLORS['text_primary']};
             }}
             QGroupBox::title {{
                 subcontrol-origin: margin;
                 left: 16px;
                 padding: 0 8px;
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
                 font-size: 14px;
             }}
         """)
@@ -127,34 +132,44 @@ class APITester(QWidget):
         config_layout.setContentsMargins(16, 8, 16, 16)
 
         config_label = QLabel("配置:")
-        config_label.setStyleSheet(f"color: {COLORS['text']}; font-size: 14px; font-weight: 500;")
+        config_label.setStyleSheet(f"color: {COLORS['text_primary']}; font-size: 14px; font-weight: 500;")
         config_layout.addWidget(config_label)
 
         self.config_combo = QComboBox()
         self.config_combo.setStyleSheet(f"""
             QComboBox {{
-                background-color: {COLORS['surface']};
+                background-color: {COLORS['bg_input']};
                 border: 1px solid {COLORS['border']};
                 border-radius: 8px;
-                padding: 8px 12px;
+                padding: 10px 30px 10px 14px;
                 font-size: 14px;
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
             }}
             QComboBox:focus {{
-                border: 2px solid {COLORS['primary']};
+                border: 2px solid {COLORS['border_focus']};
             }}
             QComboBox:hover {{
-                border-color: {COLORS['border_hover']};
+                border-color: {COLORS['border_light']};
             }}
             QComboBox::drop-down {{
                 border: none;
                 width: 20px;
+                padding-right: 8px;
             }}
             QComboBox::down-arrow {{
                 image: none;
                 border-left: 5px solid transparent;
                 border-right: 5px solid transparent;
-                border-top: 5px solid {COLORS['text_muted']};
+                border-top: 5px solid {COLORS['text_secondary']};
+            }}
+            QComboBox QAbstractItemView {{
+                background-color: {COLORS['bg_secondary']};
+                border: 1px solid {COLORS['border']};
+                border-radius: 8px;
+                selection-background-color: {COLORS['primary_light']};
+                selection-color: {COLORS['primary']};
+                color: {COLORS['text_primary']};
+                padding: 4px;
             }}
         """)
         self.config_combo.currentIndexChanged.connect(self.on_config_changed)
@@ -171,14 +186,14 @@ class APITester(QWidget):
                 border-radius: 12px;
                 margin-top: 12px;
                 padding-top: 16px;
-                background-color: {COLORS['surface']};
-                color: {COLORS['text']};
+                background-color: {COLORS['bg_card']};
+                color: {COLORS['text_primary']};
             }}
             QGroupBox::title {{
                 subcontrol-origin: margin;
                 left: 16px;
                 padding: 0 8px;
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
                 font-size: 14px;
             }}
         """)
@@ -191,18 +206,18 @@ class APITester(QWidget):
         self.message_input.setMaximumHeight(120)
         self.message_input.setStyleSheet(f"""
             QTextEdit {{
-                background-color: {COLORS['surface']};
+                background-color: {COLORS['bg_input']};
                 border: 1px solid {COLORS['border']};
                 border-radius: 8px;
                 padding: 12px 14px;
                 font-size: 14px;
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
             }}
             QTextEdit:focus {{
-                border: 2px solid {COLORS['primary']};
+                border: 2px solid {COLORS['border_focus']};
             }}
             QTextEdit:hover {{
-                border-color: {COLORS['border_hover']};
+                border-color: {COLORS['border_light']};
             }}
         """)
         input_layout.addWidget(self.message_input)
@@ -215,10 +230,10 @@ class APITester(QWidget):
         self.send_btn.setStyleSheet(f"""
             QPushButton {{
                 background-color: {COLORS['primary']};
-                color: {COLORS['surface']};
+                color: {COLORS['text_primary']};
                 border: none;
                 border-radius: 8px;
-                padding: 10px 24px;
+                padding: 12px 24px;
                 font-size: 14px;
                 font-weight: 500;
             }}
@@ -235,16 +250,16 @@ class APITester(QWidget):
         self.clear_btn = QPushButton("清空")
         self.clear_btn.setStyleSheet(f"""
             QPushButton {{
-                background-color: {COLORS['background']};
-                color: {COLORS['text']};
+                background-color: transparent;
+                color: {COLORS['text_primary']};
                 border: 1px solid {COLORS['border']};
                 border-radius: 8px;
-                padding: 10px 24px;
+                padding: 12px 24px;
                 font-size: 14px;
                 font-weight: 500;
             }}
             QPushButton:hover {{
-                background-color: {COLORS['border']};
+                background-color: {COLORS['bg_hover']};
             }}
         """)
         self.clear_btn.clicked.connect(self.clear_all)
@@ -265,14 +280,14 @@ class APITester(QWidget):
                 border-radius: 12px;
                 margin-top: 12px;
                 padding-top: 16px;
-                background-color: {COLORS['surface']};
-                color: {COLORS['text']};
+                background-color: {COLORS['bg_card']};
+                color: {COLORS['text_primary']};
             }}
             QGroupBox::title {{
                 subcontrol-origin: margin;
                 left: 16px;
                 padding: 0 8px;
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
                 font-size: 14px;
             }}
         """)
@@ -284,12 +299,12 @@ class APITester(QWidget):
         self.response_output.setPlaceholderText("AI 响应将显示在这里...")
         self.response_output.setStyleSheet(f"""
             QTextEdit {{
-                background-color: {COLORS['background']};
+                background-color: {COLORS['bg_input']};
                 border: 1px solid {COLORS['border']};
                 border-radius: 8px;
                 padding: 12px 14px;
                 font-size: 14px;
-                color: {COLORS['text']};
+                color: {COLORS['text_primary']};
             }}
         """)
         output_layout.addWidget(self.response_output)
