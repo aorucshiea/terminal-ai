@@ -1,5 +1,5 @@
 """
-配置管理界面 - Glassmorphism + Dark Mode 设计
+配置管理界面 - Glassmorphism + Dark Mode (OLED) 设计
 """
 
 import json
@@ -10,7 +10,7 @@ try:
     from PyQt5.QtWidgets import (
         QWidget, QVBoxLayout, QHBoxLayout, QListWidget, QPushButton,
         QLabel, QLineEdit, QFormLayout, QDialog, QMessageBox, QComboBox,
-        QSpinBox, QDoubleSpinBox, QGroupBox, QFrame
+        QSpinBox, QDoubleSpinBox, QGroupBox, QFrame, QScrollArea
     )
     from PyQt5.QtCore import Qt, pyqtSignal
 except ImportError:
@@ -18,33 +18,35 @@ except ImportError:
     print("运行: pip install PyQt5")
     raise
 
-# Glassmorphism Dark Mode 配色方案
+# Glassmorphism Dark Mode (OLED) 配色方案
 COLORS = {
-    'bg_primary': '#0F172A',
-    'bg_secondary': '#1E293B',
-    'bg_card': 'rgba(30, 41, 59, 0.8)',
-    'bg_hover': 'rgba(51, 65, 85, 0.9)',
+    'bg_primary': '#020617',
+    'bg_secondary': '#0F172A',
+    'bg_card': 'rgba(15, 23, 42, 0.8)',
+    'bg_card_hover': 'rgba(30, 41, 59, 0.9)',
     'bg_input': '#1E293B',
-    'text_primary': '#F8FAFC',
-    'text_secondary': '#94A3B8',
+    'bg_nav': 'rgba(2, 6, 23, 0.95)',
+    'text_primary': '#F9FAFB',
+    'text_secondary': '#CBD5E1',
     'text_muted': '#64748B',
-    'primary': '#F59E0B',
-    'primary_hover': '#D97706',
-    'primary_light': 'rgba(245, 158, 11, 0.15)',
-    'accent': '#8B5CF6',
-    'accent_hover': '#7C3AED',
-    'accent_light': 'rgba(139, 92, 246, 0.15)',
-    'success': '#10B981',
-    'danger': '#EF4444',
-    'warning': '#F59E0B',
-    'border': 'rgba(51, 65, 85, 0.6)',
-    'border_light': 'rgba(148, 163, 184, 0.3)',
-    'border_focus': '#F59E0B',
+    'primary': '#0EA5E9',
+    'primary_hover': '#0284C7',
+    'primary_light': 'rgba(14, 165, 233, 0.15)',
+    'success': '#22C55E',
+    'success_light': 'rgba(34, 197, 94, 0.15)',
+    'warning': '#FBBF24',
+    'warning_light': 'rgba(251, 191, 36, 0.15)',
+    'danger': '#FCA5A5',
+    'danger_light': 'rgba(252, 165, 165, 0.15)',
+    'border': 'rgba(51, 65, 85, 0.5)',
+    'border_light': 'rgba(148, 163, 184, 0.2)',
+    'border_focus': '#0EA5E9',
+    'shadow': 'rgba(0, 0, 0, 0.3)',
 }
 
 
 class ConfigDialog(QDialog):
-    """配置编辑对话框"""
+    """配置编辑对话框 - 现代极简风格"""
 
     def __init__(self, config: Optional[Dict] = None, parent=None):
         super().__init__(parent)
@@ -274,7 +276,7 @@ class ConfigDialog(QDialog):
 
 
 class ConfigManager(QWidget):
-    """配置管理界面"""
+    """配置管理界面 - 现代极简设计"""
 
     config_changed = pyqtSignal()
 
@@ -323,7 +325,7 @@ class ConfigManager(QWidget):
                 color: {COLORS['text_primary']};
             }}
             QListWidget::item:hover {{
-                background-color: {COLORS['bg_hover']};
+                background-color: {COLORS['bg_card_hover']};
             }}
             QListWidget::item:selected {{
                 background-color: {COLORS['primary_light']};
@@ -365,7 +367,7 @@ class ConfigManager(QWidget):
                 font-weight: 500;
             }}
             QPushButton:hover {{
-                background-color: {COLORS['bg_hover']};
+                background-color: {COLORS['bg_card_hover']};
             }}
         """)
         edit_btn.clicked.connect(self.edit_config)
@@ -401,7 +403,7 @@ class ConfigManager(QWidget):
                 font-weight: 500;
             }}
             QPushButton:hover {{
-                background-color: #059669;
+                background-color: #16A34A;
             }}
         """)
         test_btn.clicked.connect(self.test_connection)
@@ -418,7 +420,7 @@ class ConfigManager(QWidget):
                 font-weight: 500;
             }}
             QPushButton:hover {{
-                background-color: {COLORS['bg_hover']};
+                background-color: {COLORS['bg_card_hover']};
             }}
         """)
         set_default_btn.clicked.connect(self.set_default)
